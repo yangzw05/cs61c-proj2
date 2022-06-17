@@ -34,9 +34,55 @@
 #  $a1 = character buffer to write into
 #
 # Returns: none
+#
+# Equivalent C code:
+#
+# int i = 8;		
+# char* c;
+# char* a = c;
+# int b;
+# while (i > 0) {
+# 	b = x & 0xf0000000
+# 	b = b >> 28;	// check 4 bits at a time
+# 	if (b >= 10) {
+#		b += 87		// Returns small letter (a-f)
+#	} else {
+#		b += 48;	// Returns number (0-9)
+#	}
+#	*c = b;		// concatenate string with new elem
+# 	c++;
+# 	i--;
+# 	x = x << 4;	// push these bits aside (get next 4 bits)
+# }
+# *c = '\n';
+# c++;
+# *c = '\0';
+# return a;
+#
 #------------------------------------------------------------------------------
 hex_to_str:
-	# YOUR CODE HERE
+	li $t0, 8
+	li $t1, 0xf0000000
+hex_to_str_loop:
+	blt $t0, 1, hex_to_str_ret
+	and $t2, $a0, $t1
+	srl $t3, $t2, 28
+	bge $t3, 10, hex_to_str_1
+	addiu $t3, $t3, 48
+	j hex_to_str_2
+hex_to_str_1:
+	addiu $t3, $t3, 87
+hex_to_str_2:
+	sb $t3, 0($a1)
+	addiu $a1, $a1, 1
+	addiu $t0, $t0, -1
+	sll $a0, $a0, 4
+	j hex_to_str_loop
+hex_to_str_ret:
+	li $t3, 10
+	sb $t3, 0($a1)
+	addiu $a1, $a1, 1
+	sb $0, 0($a1)
 	jr $ra
 
 ###############################################################################
@@ -162,6 +208,7 @@ readline_next:
 	bgt $t4, $t1, readline_err2
 	j readline_next
 readline_done:			# at this point, $v0 contains the # bytes read
+	sb $0, -1($a1)
 	sb $0, 0($a1)
 	move $v1, $t0
 	jr $ra

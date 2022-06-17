@@ -45,7 +45,16 @@ relocLabel: .asciiz ".relocation"
 # Returns: 1 if the instruction needs relocation, 0 otherwise.
 #------------------------------------------------------------------------------
 inst_needs_relocation:
-	# YOUR CODE HERE
+	srl $t0, $a0, 26
+	andi $t0, $t0, 0x3f
+	li $t1, 2
+	li $t2, 3
+	beq $t0, $t1, inst_needs_relocation_yes
+	beq $t0, $t2, inst_needs_relocation_yes
+	li $v0, 0
+	jr $ra
+inst_needs_relocation_yes:
+	li $v0, 1
 	jr $ra
 	
 #------------------------------------------------------------------------------
@@ -67,7 +76,32 @@ inst_needs_relocation:
 # Returns: the relocated instruction, or -1 if error
 #------------------------------------------------------------------------------
 relocate_inst:
-	# YOUR CODE HERE
+	addiu $sp, $sp, -12
+	sw $ra, 0($sp)
+	sw $a2, 4($sp)
+	sw $a0, 8($sp)
+	# find label name based on instruction address (using relo table)
+	move $a0, $a3
+	jal symbol_for_addr
+	beq $v0, $0, relocate_inst_error
+	# find new address based on label name (using symbol table)
+	move $a1, $v0	
+	lw $a2, 4($sp)
+	move $a0, $a2
+	jal addr_for_symbol
+	li $t0, -1
+	beq $v0, $t0, relocate_inst_error
+	# relocate instruction
+	srl $t1, $v0, 2			# Get the 26 last bits, with 0 at the end
+	lw $a0, 8($sp)
+	andi $t2, $a0, 0xFC000000 	# Get the top 6 bits of the current instruction
+	or $v0, $t1, $t2
+	j relocate_inst_ret
+relocate_inst_error:
+	li $v0, -1
+relocate_inst_ret:
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
 
 ###############################################################################

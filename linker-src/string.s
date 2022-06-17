@@ -27,8 +27,16 @@ tab:	.asciiz "\t"
 # Returns: the length of the string
 #------------------------------------------------------------------------------
 strlen:
-	# YOUR CODE HERE
-	jr $ra
+	addiu	$t1, $0, 0
+strlen_loop:	
+	lb 	$t0, 0($a0)
+	beq	$t0, 0, strlen_return
+	addiu	$a0, $a0, 1
+	addiu	$t1, $t1, 1
+	j	strlen_loop
+strlen_return:		
+	move	$v0, $t1
+	jr 	$ra
 
 #------------------------------------------------------------------------------
 # function strncpy()
@@ -41,8 +49,20 @@ strlen:
 # Returns: the destination array
 #------------------------------------------------------------------------------
 strncpy:
-	# YOUR CODE HERE
-	jr $ra
+	move	$t2, $a0
+	addiu	$t1, $0, 0	# $t1 = i
+strncpy_loop:	
+	lb 	$t0, 0($a1)
+	#beq	$t0, 0, strncpy_ret
+	beq	$t1, $a2, strncpy_ret
+	sb	$t0, 0($a0)
+	addiu	$a0, $a0, 1
+	addiu	$a1, $a1, 1
+	addiu	$t1, $t1, 1
+	j	strncpy_loop
+strncpy_ret:	
+	move	$v0, $t2	
+	jr 	$ra
 
 #------------------------------------------------------------------------------
 # function copy_of_str()
@@ -57,8 +77,24 @@ strncpy:
 # Returns: pointer to the copy of the string
 #------------------------------------------------------------------------------
 copy_of_str:
-	# YOUR CODE HERE
-	jr $ra
+	addiu	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	
+	move	$a1, $a0	# $a1 = address of source string
+	# get string length
+	jal	strlen		
+	move	$a2, $v0	# $a2 = string length
+	# allocate space.
+	move	$a0, $v0
+	li	$v0, 9
+	syscall
+	move	$a0, $v0	# a0 = address of destination string
+	# copy string
+	jal	strncpy
+
+	lw	$ra, 0($sp)
+	addiu	$sp, $sp, 4
+	jr 	$ra
 
 ###############################################################################
 #                 DO NOT MODIFY ANYTHING BELOW THIS POINT                       

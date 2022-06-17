@@ -48,7 +48,28 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-	# YOUR CODE HERE
+	addiu $sp, $sp, -12
+	sw $ra, 0($sp)
+	sw $s0, 4($sp)
+	sw $a1, 8($sp)
+	move $s0, $a0
+addr_for_symbol_loop:
+	beq $s0, $0, addr_for_symbol_no	
+	lw $a0, 4($s0)
+	jal streq 
+	lw $a1, 8($sp)
+	beq $v0, $0, addr_for_symbol_yes
+	lw $s0, 8($s0)
+	j addr_for_symbol_loop
+addr_for_symbol_no:	
+	li $v0, -1
+	j addr_for_symbol_re
+addr_for_symbol_yes:
+	lw $v0, 0($s0)
+addr_for_symbol_re:	
+	lw $ra, 0($sp)
+	lw $s0, 4($sp)
+	addiu $sp, $sp, 12 
 	jr $ra
 	
 #------------------------------------------------------------------------------
@@ -70,7 +91,28 @@ addr_for_symbol:
 # Returns: the new list
 #------------------------------------------------------------------------------
 add_to_list:	
-	# YOUR CODE HERE
+	addiu $sp, $sp, -20
+	sw $ra, 0($sp)
+	sw $s0, 4($sp)
+	sw $a0, 8($sp)
+	sw $a1, 12($sp)
+	sw $a2, 16($sp)
+	
+	jal new_node
+	move $s0, $v0 # new node pointer
+	lw $a0, 8($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
+	sw $a1, 0($s0)	# assign address of the new node 
+	sw $a0, 8($s0)	# assign sybolist* next of the new node 
+	move $a0, $a2
+	jal copy_of_str
+	sw $v0, 4($s0) # assign name pointer of the new node 
+	move $v0, $s0  # return new list 
+	
+	lw $ra, 0($sp)
+	lw $s0, 4($sp)
+	addiu $sp, $sp, 20
 	jr $ra
 
 ###############################################################################
