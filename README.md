@@ -1,7 +1,9 @@
-This repository contains the second project (MIPS Assembler/Linker) of the CS61c Course at UC Berkeley. I self-learned this course online.
+This repository contains the second course project I completed when I self learned UC Berkeley CS61C online.
 Course Website: http://www-inst.eecs.berkeley.edu/~cs61c/su15/
 
-MIPS Assembler / Linker - A two-part project that involved (a) writing an assembler that translates a subset of the MIPS instructure set to machine code and (b) implementing a linker that processes the machine code and generates an executable file --
+MIPS Assembler / Linker - A two-part project that involved:
+(a) writing an assembler that translates 18 MIPS instructions and 5 pseudoinstructions to machine code
+(b) implementing a linker that processes the machine code and generates an executable file.
 
 Project 2.1: http://www-inst.eecs.berkeley.edu/~cs61c/su15/projs/02/
 
